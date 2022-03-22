@@ -1,9 +1,11 @@
 import { Disclosure } from "@headlessui/react"
+import { useRouter } from "next/router"
+import { useState } from "react/cjs/react.production.min"
 
 const navigation = [
-  { name: "Post récent", href: "#", current: true },
-  { name: "Post Popullaire", href: "#", current: false },
-  { name: "Mes posts ", href: "#", current: false },
+  { name: "Post Popullaire", href: "/posts/popular", current: true },
+  { name: "Post récent", href: "/posts/recent", current: false },
+  { name: "Mes posts", href: "/posts/my-post", current: false },
 ]
 
 function classNames(...classes) {
@@ -11,6 +13,14 @@ function classNames(...classes) {
 }
 
 const HeaderNavBar = () => {
+  const router = useRouter()
+  const selected = router.asPath
+
+  const handleClick = (href) => {
+    console.log(href)
+    router.push(href)
+  }
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="relative flex items-center justify-between h-16 mx-4">
@@ -23,11 +33,11 @@ const HeaderNavBar = () => {
           <div className="hidden sm:block sm:ml-6">
             <div className="flex space-x-4">
               {navigation.map((item) => (
-                <a
+                <p
                   key={item.name}
-                  href={item.href}
+                  onClick={() => handleClick(item.href)}
                   className={classNames(
-                    item.current
+                    selected == item.href
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
                     "px-3 py-2 rounded-md text-sm font-medium"
@@ -35,7 +45,7 @@ const HeaderNavBar = () => {
                   aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
-                </a>
+                </p>
               ))}
             </div>
           </div>
