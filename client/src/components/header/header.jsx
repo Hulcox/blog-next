@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react"
 import { useRouter } from "next/router"
-import { useState } from "react/cjs/react.production.min"
+import MenuDropDown from "../MenuDropDown/MenuDropDown"
 
 const navigation = [
   { name: "Post Popullaire", href: "/posts/popular", current: true },
@@ -31,7 +31,7 @@ const HeaderNavBar = () => {
             </h1>
           </div>
           <div className="hidden sm:block sm:ml-6">
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 ">
               {navigation.map((item) => (
                 <p
                   key={item.name}
@@ -50,7 +50,24 @@ const HeaderNavBar = () => {
             </div>
           </div>
         </div>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <MenuDropDown list={[{ title: "test", href: "test" }]}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-white text-5xl"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </MenuDropDown>
+        </div>
       </div>
     </Disclosure>
   )
