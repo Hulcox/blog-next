@@ -1,12 +1,22 @@
+import { useRouter } from "next/router"
 import React, { useState } from "react"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-const PostBlog = ({ title, subTitle, owner, date, content, subscribed }) => {
+const PostBlog = ({
+  id,
+  title,
+  subTitle,
+  owner,
+  date,
+  content,
+  subscribed,
+}) => {
   const [liked, setLiked] = useState(false)
   const [subscriber, setSubscriber] = useState(subscribed)
+  const router = useRouter()
 
   const handleClickLike = () => {
     setLiked(!liked)
@@ -16,8 +26,12 @@ const PostBlog = ({ title, subTitle, owner, date, content, subscribed }) => {
     setSubscriber(!subscriber)
   }
 
+  const handleClickView = () => {
+    router.push("/posts/" + id)
+  }
+
   return (
-    <div className="mx-auto w-1/2 mt-8 shadow-gray-100 shadow-md p-8">
+    <div className="mx-auto w-1/2 mt-2 shadow-gray-100 shadow-md p-8">
       <h2 className="text-5xl font-bold">{title}</h2>
       <div className="mt-4 mx-2 flex flex-row items-center">
         <div className="rounded-full h-10 w-10 flex items-center justify-center bg-red-300 mr-2">
@@ -99,7 +113,12 @@ const PostBlog = ({ title, subTitle, owner, date, content, subscribed }) => {
           </button>
         </div>
         <div className="text-center">
-          <button className="font-bold text-2xl text-gray-700">...</button>
+          <button
+            className="font-bold text-2xl text-gray-700"
+            onClick={handleClickView}
+          >
+            ...
+          </button>
         </div>
         <div>
           <p>
