@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id                  Int      @id @default(autoincrement())
+  title               String
+  subTitle            String?
+  content             String
+  like                Int      @default(0)
+  authorPost          Profile  @relation(fields: [authorId], references: [id])
+  authorId            Int      @unique
+  comment             Comment[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Comment {
+  id                  Int      @id @default(autoincrement())
+  content             String
+  post                Post     @relation(fields: [postId], references: [id])
+  postId              Int
+  authorComment       Profile  @relation(fields: [authorCommentId], references: [id])
+  authorCommentId     Int      @unique
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Follow {
+  id                  Int      @id @default(autoincrement())
+  followers           Profile  @relation(name: "followers",fields: [followersId], references: [id])
+  followersId         Int
+  followed            Profile  @relation(name: "followed",fields: [followedId], references: [id])
+  followedId          Int  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Profile {
+  id                  Int       @id @default(autoincrement())
+  firstName           String
+  lastName            String
+  address             String
+  city                String?
+  zip_code            String?
+  user                User      @relation(fields: [userId], references: [id])
+  userId              Int       @unique
+  posts               Post[]
+  comment             Comment[]
+  followers           Follow[]  @relation(name: "followers")
+  followed            Follow[]  @relation(name: "followed")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model User {
+  id                  Int      @id @default(autoincrement())
+  email               String   @unique
+  passwordHash        String
+  passwordSalt        String
+  levelAuth           String   @default("r")
+  profile Profile?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
