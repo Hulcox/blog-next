@@ -1,13 +1,15 @@
+import axios from "axios"
 import { Field, Form, Formik } from "formik"
 import { useRouter } from "next/router"
 import { useCallback, useContext } from "react"
 import * as Yup from "yup"
+import api from "../../src/components/api"
 import AppContext from "../../src/components/appContext"
 import InputForm from "../../src/components/formikComponents/InputFrom"
 import HeaderNavBar from "../../src/components/header/header"
 
 const LoginPageSignIn = () => {
-  const { handleSetComments } = useContext(AppContext)
+  const {} = useContext(AppContext)
   const router = useRouter()
 
   const classNames = (...classes) => {
@@ -15,23 +17,35 @@ const LoginPageSignIn = () => {
   }
 
   const CommentSchema = Yup.object().shape({
-    textarea: Yup.string()
-      .max(500, "Comment max size 500!")
-      .required(" Required"),
+    email: Yup.string().email().required(" Required"),
+    password: Yup.string().required(" Required"),
   })
 
-  const handleFormSubmit = useCallback(
-    (value, { resetForm }) => {
-      console.log(value)
-      handleSetComments({
-        owner: "Romain le boss",
-        date: Date.now(),
-        comment: value.textarea,
-      })
+  const handleFormSubmit = useCallback((value, { resetForm }) => {
+    console.log(value)
+
+    try {
+      fetchRemote(value)
+    } catch (error) {
       resetForm()
-    },
-    [handleSetComments]
-  )
+    }
+  }, [])
+
+  const fetchRemote = (value) => {
+    axios
+      .post("http://localhost:3030/sign-in", {
+        email: value.email,
+        password: value.password,
+      })
+      .then((res) => {
+        const data = res.data
+        console.log(data)
+        localStorage.setItem("jwt", data.token)
+        localStorage.setItem("userLevel", data.userLevel)
+        document.cookie = "jwt=" + data.token + "; path=/"
+        //router.push("/posts/feeds")
+      })
+  }
 
   const signUp = () => {
     router.push("/login/sign-up")
@@ -101,6 +115,7 @@ const LoginPageSignIn = () => {
                   </p>
                   <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button
+                      type="submit"
                       className={classNames(
                         isSubmitting
                           ? "bg-[#2e496f] text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"

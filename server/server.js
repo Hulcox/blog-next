@@ -1,19 +1,22 @@
 import express from "express";
-import sessionRoutes from "../server/src/routes/session.js";
+import sessionRoutes from "./src/session.js";
+import cors from "cors";
 import pino from "pino";
 import "dotenv/config";
+import morgan from "morgan";
 
-const logger = pino({
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
-});
 const app = express();
 const port = process.env.PORT;
 
+app.options(
+  "*",
+  cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 })
+);
+
+app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
+app.use(morgan("dev"));
 app.use(express.json());
 
 sessionRoutes({ app });
 
-app.listen(port, () => logger.info(`🎉 Listening on :${process.env.port}`));
+app.listen(port, () => console.log(`🎉 Listening on :${port}`));

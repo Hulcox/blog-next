@@ -20,18 +20,19 @@ model Post {
   authorId            Int      @unique
   comment             Comment[]
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @updatedAt @default(now())
 }
 
 model Comment {
   id                  Int      @id @default(autoincrement())
   content             String
+  like                Int      @default(0)
   post                Post     @relation(fields: [postId], references: [id])
   postId              Int
   authorComment       Profile  @relation(fields: [authorCommentId], references: [id])
   authorCommentId     Int      @unique
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @updatedAt @default(now())
 }
 
 model Follow {
@@ -41,7 +42,7 @@ model Follow {
   followed            Profile  @relation(name: "followed",fields: [followedId], references: [id])
   followedId          Int  
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @updatedAt @default(now())
 }
 
 model Profile {
@@ -58,7 +59,7 @@ model Profile {
   followers           Follow[]  @relation(name: "followers")
   followed            Follow[]  @relation(name: "followed")
   createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  updatedAt           DateTime  @updatedAt @default(now())
 }
 
 model User {
@@ -69,5 +70,5 @@ model User {
   levelAuth           String   @default("r")
   profile Profile?
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  updatedAt           DateTime @updatedAt @default(now())
 }

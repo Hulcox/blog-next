@@ -4,7 +4,9 @@ const AppContext = createContext({})
 
 export const AppContextProvider = (props) => {
   const [user, setUser] = useState("Romain")
+  const [post, setPost] = useState([])
   const [comments, setComments] = useState([])
+  const [jwt, setJwt] = useState("")
 
   const handleSetUser = useCallback((value) => {
     setUser(value)
@@ -17,10 +19,27 @@ export const AppContextProvider = (props) => {
     [comments]
   )
 
+  const handleSetPost = useCallback((value) => {
+    setPost([value])
+  }, [])
+
+  const handleSetJwt = useCallback((value) => {
+    setJwt([value])
+  }, [])
+
   return (
     <AppContext.Provider
       {...props}
-      value={{ user, handleSetUser, comments, handleSetComments }}
+      value={{
+        user,
+        handleSetUser,
+        comments,
+        handleSetComments,
+        post,
+        handleSetPost,
+        jwt,
+        handleSetJwt,
+      }}
     />
   )
 }
