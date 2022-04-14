@@ -14,7 +14,12 @@ export const userSignIn = async (req, res) => {
       where: {
         email: email,
       },
+      include: {
+        profile: true,
+      },
     });
+
+    console.log(user);
 
     const [passwordHash, passwordSalt] = hashPassword(
       password,
@@ -34,7 +39,11 @@ export const userSignIn = async (req, res) => {
       }
     );
 
-    res.send({ token: token, userLevel: user.levelAuth });
+    res.send({
+      token: token,
+      userLevel: user.levelAuth,
+      profile: user.profile,
+    });
   } catch (error) {
     res.status(400).send("Problème survenue : " + error);
   }

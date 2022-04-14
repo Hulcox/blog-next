@@ -16,6 +16,7 @@ import {
   readAllFeedPost,
   readAllPopularPost,
   readAllPost,
+  readMyPost,
   readPost,
   removeLike,
   updatePost,
@@ -35,6 +36,9 @@ const sessionRoutes = ({ app }) => {
   });
   app.post("/post/feed", auth, async (req, res) => {
     await readAllFeedPost(req, res);
+  });
+  app.get("/post/mypost/:authId", async (req, res) => {
+    await readMyPost(req, res);
   });
   app.get("/post/:postId", async (req, res) => {
     await readPost(req, res);

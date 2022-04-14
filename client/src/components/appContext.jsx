@@ -6,7 +6,8 @@ export const AppContextProvider = (props) => {
   const [user, setUser] = useState("Romain")
   const [post, setPost] = useState([])
   const [comments, setComments] = useState([])
-  const [jwt, setJwt] = useState("")
+  const [userLevel, setUserLevel] = useState(null)
+  const [authId, setAuthId] = useState(null)
 
   const handleSetUser = useCallback((value) => {
     setUser(value)
@@ -23,8 +24,11 @@ export const AppContextProvider = (props) => {
     setPost([value])
   }, [])
 
-  const handleSetJwt = useCallback((value) => {
-    setJwt([value])
+  const handleUserLevel = useCallback((value) => {
+    setUserLevel([value])
+  }, [])
+  const handleAuthId = useCallback((value) => {
+    setAuthId([value])
   }, [])
 
   return (
@@ -37,8 +41,10 @@ export const AppContextProvider = (props) => {
         handleSetComments,
         post,
         handleSetPost,
-        jwt,
-        handleSetJwt,
+        userLevel,
+        handleUserLevel,
+        authId,
+        handleAuthId,
       }}
     />
   )

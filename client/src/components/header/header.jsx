@@ -1,20 +1,29 @@
 import { Disclosure } from "@headlessui/react"
 import { useRouter } from "next/router"
+import { useContext, useEffect, useState } from "react"
+import AppContext from "../appContext"
 import MenuDropDown from "../MenuDropDown/MenuDropDown"
-
-const navigation = [
-  { name: "Post Popullaire", href: "/posts/popular", current: true },
-  { name: "Post récent", href: "/posts/recent", current: false },
-  { name: "Mes posts", href: "/posts/my-post", current: false },
-]
 
 const classNames = (...classes) => {
   return classes.filter(Boolean).join(" ")
 }
 
 const HeaderNavBar = () => {
+  const { userLevel } = useContext(AppContext)
+  const [navigation, setNavigation] = useState([
+    { name: "Post Popullaire", href: "/posts/popular", current: true },
+    { name: "Post récent", href: "/posts/recent", current: false },
+  ])
   const router = useRouter()
   const selected = router.asPath
+  useEffect(() => {
+    if (userLevel == "a" || userLevel == "su")
+      setNavigation([
+        { name: "Post Popullaire", href: "/posts/popular", current: true },
+        { name: "Post récent", href: "/posts/recent", current: false },
+        { name: "Mes posts", href: "/posts/my-post", current: false },
+      ])
+  }, [userLevel])
 
   const handleClick = (href) => {
     console.log(href)
@@ -57,66 +66,71 @@ const HeaderNavBar = () => {
             </div>
           </div>
         </div>
-
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <div className="text-white flex flex-row mx-2 rounded-md shadow-sm bg-slate-700 p-2">
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-red-500"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </span>
-            <div className="bg-white w-px mx-2"></div>
-            <p> 500 </p>
-          </div>
-          <div className="text-white flex flex-row mx-2 rounded-md shadow-sm bg-slate-700 p-2">
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            </span>
-            <div className="bg-white w-px mx-2"></div>
-            <p> 100 </p>
-          </div>
-          <div className="text-white flex flex-row ml-2 mr-3 rounded-md shadow-sm bg-slate-700 p-2">
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </span>
-            <div className="bg-white w-px mx-2"></div>
-            <p> 200 </p>
-          </div>
+          {userLevel == "a" || userLevel == "su" ? (
+            <div className="text-white flex flex-row mx-2 rounded-md shadow-sm bg-slate-700 p-2">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-red-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </span>
+              <div className="bg-white w-px mx-2"></div>
+              <p> 500 </p>
+            </div>
+          ) : null}
+          {userLevel == "a" || userLevel == "su" ? (
+            <div className="text-white flex flex-row mx-2 rounded-md shadow-sm bg-slate-700 p-2">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </span>
+              <div className="bg-white w-px mx-2"></div>
+              <p> 100 </p>
+            </div>
+          ) : null}
+          {userLevel == "a" || userLevel == "su" ? (
+            <div className="text-white flex flex-row ml-2 mr-3 rounded-md shadow-sm bg-slate-700 p-2">
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              </span>
+              <div className="bg-white w-px mx-2"></div>
+              <p> 200 </p>
+            </div>
+          ) : null}
           <MenuDropDown>
             <svg
               xmlns="http://www.w3.org/2000/svg"

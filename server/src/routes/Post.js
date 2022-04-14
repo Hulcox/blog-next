@@ -43,6 +43,29 @@ export const readAllPost = async (req, res) => {
   }
 };
 
+export const readMyPost = async (req, res) => {
+  const {
+    params: { authId },
+  } = req;
+  try {
+    const post = await prisma.post.findMany({
+      where: {
+        authorId: Number(authId),
+      },
+      include: {
+        authorPost: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    res.status(200).send(post);
+  } catch (error) {
+    res.status(400).send("Problème survenu : " + error);
+  }
+};
+
 export const readAllPopularPost = async (req, res) => {
   try {
     const post = await prisma.post.findMany({

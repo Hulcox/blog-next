@@ -10,7 +10,8 @@ const FeedPage = ({ data }) => {
   console.log(data)
   useEffect(() => {
     handleSetPost(data)
-  }, [handleSetPost, data])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
   return (
     <div>
       <HeaderNavBar />
@@ -33,31 +34,34 @@ const FeedPage = ({ data }) => {
 }
 
 export async function getServerSideProps({ req, res }) {
-  if (!req.headers.cookie) {
-    res.setHeader("location", "/")
-    res.statusCode = 302
-    res.end()
+  try {
+    const jwt = req.headers.cookie
+      .split("; ")
+      .find((row) => row.startsWith("jwt="))
+      .split("=")[1]
+    let data = []
+    const request = api
+      .post(
+        "/post/feed",
+
+        { authorId: 5 },
+        {
+          headers: { Authorization: jwt },
+        }
+      )
+      .then((res) => {
+        data = res.data
+      })
+    await request
+    return { props: { data: data } }
+  } catch (error) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/",
+      },
+    }
   }
-  const jwt = req.headers.cookie
-    .split("; ")
-    .find((row) => row.startsWith("jwt="))
-    .split("=")[1]
-  let data = []
-  const test = api
-    .post(
-      "/post/feed",
-
-      { authorId: 5 },
-      {
-        headers: { Authorization: jwt },
-      }
-    )
-    .then((res) => {
-      data = res.data
-    })
-  await test
-
-  return { props: { data: data } }
 }
 
 export default FeedPage

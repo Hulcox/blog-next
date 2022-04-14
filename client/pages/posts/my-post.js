@@ -1,11 +1,18 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import api from "../../src/components/api"
+import AppContext from "../../src/components/appContext"
 import HeaderNavBar from "../../src/components/header/header"
 import PostBlog from "../../src/components/post/post"
 import WritePost from "../../src/components/post/writePost"
 
-const MyPost = () => {
+const MyPost = ({ data }) => {
   const [writepost, setWritepost] = useState(false)
-  const state = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  const { handleSetPost, post } = useContext(AppContext)
+  console.log(data)
+  useEffect(() => {
+    handleSetPost(data)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
 
   const handleClick = () => {
     setWritepost(!writepost)
@@ -47,20 +54,51 @@ const MyPost = () => {
       {writepost ? (
         <WritePost />
       ) : (
-        state.map(() => (
-          <>
-            <PostBlog
-              title={"Test"}
-              subTitle={"Test2"}
-              owner={"Moi même"}
-              date={"22/03/2022"}
-              content={"nike zebi"}
-            />
-          </>
+        data.map(({ title, subTitle, createdAt, content, authorPost }, key) => (
+          <PostBlog
+            key={key}
+            id={1}
+            title={title}
+            subTitle={subTitle}
+            owner={authorPost.firstName + " " + authorPost.lastName}
+            date={new Date(createdAt).toDateString()}
+            content={content}
+          />
         ))
       )}
     </div>
   )
+}
+
+export async function getServerSideProps({ req, res }) {
+  try {
+    const jwt = req.headers.cookie
+      .split("; ")
+      .find((row) => row.startsWith("jwt="))
+      .split("=")[1]
+    const authId = req.headers.cookie
+      .split("; ")
+      .find((row) => row.startsWith("authId="))
+      .split("=")[1]
+    let data = []
+    const request = api
+      .get("/post/mypost/" + authId, {
+        headers: { Authorization: jwt },
+      })
+      .then((res) => {
+        data = res.data
+      })
+    await request
+    return { props: { data: data } }
+  } catch (error) {
+    return {
+      props: { error: error },
+      redirect: {
+        permanent: false,
+        destination: "/",
+      },
+    }
+  }
 }
 
 export default MyPost

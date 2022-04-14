@@ -9,7 +9,7 @@ import InputForm from "../../src/components/formikComponents/InputFrom"
 import HeaderNavBar from "../../src/components/header/header"
 
 const LoginPageSignIn = () => {
-  const {} = useContext(AppContext)
+  const { handleUserLevel, handleAuthId } = useContext(AppContext)
   const router = useRouter()
 
   const classNames = (...classes) => {
@@ -22,8 +22,6 @@ const LoginPageSignIn = () => {
   })
 
   const handleFormSubmit = useCallback((value, { resetForm }) => {
-    console.log(value)
-
     try {
       fetchRemote(value)
     } catch (error) {
@@ -42,9 +40,14 @@ const LoginPageSignIn = () => {
         console.log(data)
         localStorage.setItem("jwt", data.token)
         localStorage.setItem("userLevel", data.userLevel)
+        localStorage.setItem("authId", data.profile.id)
         document.cookie = "jwt=" + data.token + "; path=/"
-        //router.push("/posts/feeds")
+        document.cookie = "authId=" + data.profile.id + "; path=/"
+        handleUserLevel(data.userLevel)
+        handleAuthId(data.profile.id)
+        router.push("/posts/feeds")
       })
+      .catch((error) => {})
   }
 
   const signUp = () => {
