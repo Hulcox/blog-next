@@ -101,23 +101,29 @@ export const userSignUp = async (req, res) => {
 
 export const userUpdate = async (req, res) => {
   const {
-    body: { email, password },
+    body: { email, password, userLevel, id },
   } = req;
+
+  res.authId;
+
+  const pro = await prisma.profile.findUnique({ where: { id: authId } });
 
   try {
     const [passwordHash, passwordSalt] = hashPassword(password);
 
     await prisma.user.update({
+      where: { id: pro.userId },
       data: {
         email: email,
         passwordHash: passwordHash,
         passwordSalt: passwordSalt,
+        levelAuth: userLevel,
       },
     });
 
     const user = await prisma.user.findFirst({
       where: {
-        email: email,
+        OR: [{ email: email }, { id: id }],
       },
     });
 

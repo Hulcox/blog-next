@@ -44,7 +44,24 @@ const LoginPageSignUp = () => {
 
   const handleFormSubmit = useCallback((value, { resetForm }) => {
     try {
-      fetchRemote(value).then(() => {
+      fetchRemote(value)
+    } catch (error) {
+      resetForm()
+    }
+  }, [])
+
+  const fetchRemote = async (value) => {
+    api
+      .post("/sign-up", {
+        firstName: value.firstName,
+        lastName: value.lastName,
+        email: value.email,
+        address: value.address,
+        city: value.city,
+        zip_code: value.zip_code,
+        password: value.password,
+      })
+      .then(() => {
         api
           .post("/sign-in", {
             email: value.email,
@@ -63,21 +80,7 @@ const LoginPageSignUp = () => {
             router.push("/posts/feeds")
           })
       })
-    } catch (error) {
-      resetForm()
-    }
-  }, [])
-
-  const fetchRemote = async (value) => {
-    api.post("/sign-up", {
-      firstName: value.firstName,
-      lastName: value.lastName,
-      email: value.email,
-      address: value.address,
-      city: value.city,
-      zip_code: value.zip_code,
-      password: value.password,
-    })
+      .catch((error) => console.log(error))
   }
 
   const signIn = () => {

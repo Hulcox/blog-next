@@ -1,3 +1,4 @@
+import { useRouter } from "next/router"
 import { useContext, useEffect, useState } from "react"
 import api from "../../src/components/api"
 import AppContext from "../../src/components/appContext"
@@ -7,10 +8,11 @@ import WritePost from "../../src/components/post/writePost"
 
 const MyPost = ({ data }) => {
   const [writepost, setWritepost] = useState(false)
-  const { handleSetPost, post } = useContext(AppContext)
+  const { handleSetPost, user, handleSetUser } = useContext(AppContext)
   console.log(data)
   useEffect(() => {
     handleSetPost(data)
+    handleSetUser(localStorage.getItem("profile"))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
@@ -18,11 +20,16 @@ const MyPost = ({ data }) => {
     setWritepost(!writepost)
   }
 
+  const router = useRouter()
+  const logout = () => {
+    router.push("/logout")
+  }
+
   return (
     <div>
       <HeaderNavBar />
       <div className="mx-auto w-1/2 mt-8 shadow-gray-100 shadow-md p-4 flex justify-between bg-slate-200 items-center rounded">
-        <h1 className="text-xl font-bold">{"Romain's posts list"}</h1>
+        <h1 className="text-xl font-bold">{user + "'s posts list"}</h1>
         <button
           className={
             "bg-[#2e496f] hover:bg-[#1f2937] text-white font-bold py-2 px-4 rounded"
@@ -52,7 +59,25 @@ const MyPost = ({ data }) => {
       </div>
       <div className="mx-auto w-1/2 mt-8 bg-slate-400 h-px"></div>
       {writepost ? (
-        <WritePost />
+        <div className="mx-auto w-1/2 shadow-gray-100 shadow-md p-8">
+          <h1 className="text-3xl font-bold text-black p-4">Write new post</h1>
+          <div className="mt-4 mx-2 flex flex-row items-center">
+            <div className="rounded-full h-10 w-10 flex items-center justify-center bg-red-300 mr-2">
+              <a className="text-xl font-bold">{user.slice(0, 1)}</a>
+            </div>
+            <p>
+              <span> Signed as </span>
+              <span className="font-bold">{user}</span>
+              <span>. </span>
+              <span className="underline" onClick={logout}>
+                logout ?
+              </span>
+            </p>
+          </div>
+          <div className="m-4 mt-[5vh]">
+            <WritePost />
+          </div>
+        </div>
       ) : (
         data.map(
           (

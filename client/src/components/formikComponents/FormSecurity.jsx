@@ -28,7 +28,23 @@ const FormSecurity = ({ data }) => {
 
   const handleFormSubmit = useCallback((value, { resetForm }) => {
     try {
-      fetchRemote(value).then(() => {
+      fetchRemote(value)
+    } catch (error) {
+      resetForm()
+    }
+  }, [])
+
+  const fetchRemote = async (value) => {
+    api
+      .put(
+        "/user",
+        {
+          email: data.email,
+          password: value.password,
+        },
+        { headers: { Authorization: localStorage.getItem("jwt") } }
+      )
+      .then(() => {
         api
           .post("/sign-in", {
             email: data.email,
@@ -47,20 +63,6 @@ const FormSecurity = ({ data }) => {
             router.push("/profile/account")
           })
       })
-    } catch (error) {
-      resetForm()
-    }
-  }, [])
-
-  const fetchRemote = async (value) => {
-    api.put(
-      "/user",
-      {
-        email: data.email,
-        password: value.password,
-      },
-      { headers: { Authorization: localStorage.getItem("jwt") } }
-    )
   }
 
   const signIn = () => {

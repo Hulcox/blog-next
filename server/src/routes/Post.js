@@ -151,22 +151,22 @@ export const updatePost = async (req, res) => {
   const {
     body: { title, subTitle, content, authorId, published },
   } = req;
-
+  console.log(title, subTitle, content, authorId, published);
   const {
     params: { postId },
   } = req;
-  try {
-    const post = await prisma.post.update({
-      where: { id: Number(postId) },
-      data: {
-        title: title,
-        subTitle: subTitle,
-        content: content,
-        authorId: authorId,
-        published: published,
-      },
-    });
 
+  const post = await prisma.post.update({
+    where: { id: Number(postId) },
+    data: {
+      title: title,
+      subTitle: subTitle,
+      content: content,
+      authorId: Number(authorId),
+      published: published,
+    },
+  });
+  try {
     res.status(200).send(post);
   } catch (error) {
     res.status(400).send("Problème survenu : " + error);

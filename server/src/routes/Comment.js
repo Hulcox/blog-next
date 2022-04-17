@@ -78,7 +78,7 @@ export const updateComment = async (req, res) => {
       data: {
         content: content,
         postId: Number(postId),
-        authorCommentId: authorCommentId,
+        authorCommentId: Number(authorCommentId),
       },
     });
 

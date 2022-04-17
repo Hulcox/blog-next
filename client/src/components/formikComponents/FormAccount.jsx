@@ -34,7 +34,26 @@ const FormAccount = ({ data }) => {
 
   const handleFormSubmit = useCallback((value, { resetForm }) => {
     try {
-      fetchRemote(value).then(() => {
+      fetchRemote(value)
+    } catch (error) {
+      resetForm()
+    }
+  }, [])
+
+  const fetchRemote = async (value) => {
+    api
+      .put(
+        "/profile",
+        {
+          firstName: value.firstName,
+          lastName: value.lastName,
+          address: value.address,
+          city: value.city,
+          zip_code: value.zip_code,
+        },
+        { headers: { Authorization: localStorage.getItem("jwt") } }
+      )
+      .then(() => {
         api
           .post("/sign-in", {
             email: value.email,
@@ -53,23 +72,6 @@ const FormAccount = ({ data }) => {
             router.push("/profile/account")
           })
       })
-    } catch (error) {
-      resetForm()
-    }
-  }, [])
-
-  const fetchRemote = async (value) => {
-    api.put(
-      "/profile",
-      {
-        firstName: value.firstName,
-        lastName: value.lastName,
-        address: value.address,
-        city: value.city,
-        zip_code: value.zip_code,
-      },
-      { headers: { Authorization: localStorage.getItem("jwt") } }
-    )
   }
 
   const signIn = () => {

@@ -4,9 +4,28 @@ import InputForm from "../../src/components/formikComponents/InputFrom"
 import FormAccount from "../../src/components/formikComponents/FormAccount"
 import HeaderNavBar from "../../src/components/header/header"
 import ProfileMenu from "../../src/components/profileMenu"
+import { Switch } from "@headlessui/react"
+import { useEffect } from "react/cjs/react.development"
 
 const ProfileAccountPage = ({ data }) => {
   const [modified, setModified] = useState(false)
+  const [enabled, setEnabled] = useState(false)
+  useEffect(() => {
+    if (
+      localStorage.getItem("userLevel") == "a" ||
+      localStorage.getItem("userLevel") == "admin"
+    )
+      handlePublished(true)
+    else handlePublished(false)
+  }, [])
+  const handlePublished = () => {
+    setEnabled(!enabled)
+    api.put(
+      "/user",
+      { published: !enabled, userLevel: localStorage.getItem("userLevel") },
+      { headers: { Authorization: localStorage.getItem("jwt") } }
+    )
+  }
 
   return (
     <div>
@@ -19,6 +38,22 @@ const ProfileAccountPage = ({ data }) => {
           <FormAccount data={data} />
         ) : (
           <div className="w-3/4 h-1/2 bg-slate-100 shadow-gray-100 shadow-md rounded">
+            <div className="text-xl font-bold p-2">
+              <p>Become a creator</p>
+              <Switch
+                checked={enabled}
+                onChange={handlePublished}
+                className={`${
+                  enabled ? "bg-[#2e496f]" : "bg-gray-200"
+                } relative inline-flex items-center h-6 rounded-full w-11`}
+              >
+                <span
+                  className={`${
+                    enabled ? "translate-x-6" : "translate-x-1"
+                  } inline-block w-4 h-4 transform bg-white rounded-full`}
+                />
+              </Switch>
+            </div>
             <div className="grid grid-cols-6 gap-6 p-2">
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">

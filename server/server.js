@@ -6,7 +6,7 @@ import "dotenv/config";
 import morgan from "morgan";
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.SERVER_PORT;
 
 app.options(
   "*",
