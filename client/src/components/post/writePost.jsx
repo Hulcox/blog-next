@@ -1,12 +1,15 @@
-import { Field, Form, Formik } from "formik"
+import { ErrorMessage, Field, Form, Formik } from "formik"
 import { useCallback, useContext } from "react"
 import AppContext from "../appContext"
 import * as Yup from "yup"
 import textArea from "../formikComponents/textArea"
 import InputForm from "../formikComponents/InputFrom"
+import api from "../api"
+import { useRouter } from "next/router"
 
 const WritePost = () => {
   const { user, handleSetComments } = useContext(AppContext)
+  const router = useRouter()
 
   const logout = () => {}
 
@@ -15,24 +18,30 @@ const WritePost = () => {
   }
 
   const CommentSchema = Yup.object().shape({
+    Title: Yup.string().required(),
+    subTitle: Yup.string(),
     textarea: Yup.string()
       .max(500, "Comment max size 500!")
       .required(" Required"),
   })
 
-  const handleFormSubmit = useCallback(
-    (value, { resetForm }) => {
-      console.log(value)
-      handleSetComments({
-        owner: "Romain le boss",
-        date: Date.now(),
-        comment: value.textarea,
-      })
-      resetForm()
-    },
-    [handleSetComments]
-  )
-
+  const handleFormSubmit = useCallback((value, { resetForm }) => {
+    console.log(value)
+    api
+      .post(
+        "/post",
+        {
+          title: value.Title,
+          subTitle: value.subTitle,
+          content: value.textarea,
+          authorId: localStorage.getItem("authId"),
+        },
+        { headers: { Authorization: localStorage.getItem("jwt") } }
+      )
+      .then((res) => router.push("/posts/" + res.data.postId))
+    resetForm()
+  }, [])
+  console.log(user)
   return (
     <div className="mx-auto w-1/2 shadow-gray-100 shadow-md p-8">
       <h1 className="text-3xl font-bold text-black p-4">Write new post</h1>
@@ -53,7 +62,7 @@ const WritePost = () => {
         <Formik
           validationSchema={CommentSchema}
           initialValues={{
-            title: "",
+            Title: "",
             subTitle: "",
             textarea: "",
           }}
@@ -63,17 +72,28 @@ const WritePost = () => {
             <Form onSubmit={handleSubmit}>
               <div className="mt-1 flex rounded-md shadow-sm flex-wrap flex-col">
                 <Field
-                  name="title"
+                  name="Title"
                   placeholder="Write your title"
                   required
                   as={InputForm}
-                ></Field>
+                />
+                <ErrorMessage
+                  name="title"
+                  render={(msg) => (
+                    <div className="text-red-500 text-sm">{msg}</div>
+                  )}
+                />
                 <Field
                   name="subTitle"
                   placeholder="Write your sub title"
-                  required
                   as={InputForm}
-                ></Field>
+                />
+                <ErrorMessage
+                  name="suTitle"
+                  render={(msg) => (
+                    <div className="text-red-500 text-sm">{msg}</div>
+                  )}
+                />
               </div>
               <Field
                 name="textarea"
@@ -93,6 +113,7 @@ const WritePost = () => {
                       ? "bg-[#2e496f] text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
                       : "bg-[#2e496f] hover:bg-[#1f2937] text-white font-bold py-2 px-4 rounded"
                   )}
+                  type="submit"
                 >
                   Submit
                 </button>

@@ -1,13 +1,17 @@
 import { Field, Form, Formik } from "formik"
 import * as Yup from "yup"
-import { useCallback, useContext } from "react"
+import { useCallback, useContext, useEffect } from "react"
 import AppContext from "../appContext"
 import textArea from "../formikComponents/textArea"
+import api from "../api"
+import { useRouter } from "next/router"
 
-const CommentsFromBlog = () => {
-  const { user, handleSetComments } = useContext(AppContext)
-
-  const logout = () => {}
+const CommentsFromBlog = ({ postId }) => {
+  const { user, handleSetUser, handleSetComments } = useContext(AppContext)
+  const router = useRouter()
+  const logout = () => {
+    router.push("/logout")
+  }
 
   const classNames = (...classes) => {
     return classes.filter(Boolean).join(" ")
@@ -15,23 +19,32 @@ const CommentsFromBlog = () => {
 
   const CommentSchema = Yup.object().shape({
     textarea: Yup.string()
-      .max(500, "Comment max size 500!")
+      .max(500, "Comment max size 250!")
       .required(" Required"),
   })
-
-  const handleFormSubmit = useCallback(
-    (value, { resetForm }) => {
-      console.log(value)
-      handleSetComments({
-        owner: "Romain le boss",
-        date: Date.now(),
-        comment: value.textarea,
+  const handleFormSubmit = useCallback((value, { resetForm }) => {
+    console.log(value)
+    api
+      .post(
+        "/comment/" + postId,
+        {
+          content: value.textarea,
+          authorCommentId: localStorage.getItem("authId"),
+          postId: postId,
+        },
+        { headers: { Authorization: localStorage.getItem("jwt") } }
+      )
+      .then((res) => {
+        handleSetComments(res.data)
+        //router.push("/posts/" + res.data.postId)
       })
-      resetForm()
-    },
-    [handleSetComments]
-  )
+    resetForm()
+  }, [])
 
+  useEffect(() => {
+    handleSetUser(localStorage.getItem("profile"))
+  }, [])
+  console.log(user)
   return (
     <div className="mx-auto w-1/2 mt-8 shadow-gray-100 shadow-md p-8">
       <div className="w-full bg-slate-400 h-px"></div>
@@ -65,7 +78,7 @@ const CommentsFromBlog = () => {
                 as={textArea}
               />
               <p className={errors.textarea ? "text-red-600" : "text-black"}>
-                {values.textarea.length} / 500
+                {values.textarea.length} / 250
               </p>
               <p className={errors.textarea ? "text-red-600" : "text-black"}>
                 {errors.textarea && touched.textarea ? errors.textarea : null}

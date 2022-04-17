@@ -18,17 +18,32 @@ const FeedPage = ({ data }) => {
       <div className="mx-auto w-1/2 mt-8 shadow-gray-100 shadow-md p-4 flex justify-between bg-slate-200 items-center rounded">
         <h1 className="text-xl font-bold">{"Your Feeds"}</h1>
       </div>
-      {data.map(({ title, subTitle, createdAt, content, authorPost }, key) => (
-        <PostBlog
-          key={key}
-          id={1}
-          title={title}
-          subTitle={subTitle}
-          owner={authorPost.firstName + " " + authorPost.lastName}
-          date={new Date(createdAt).toDateString()}
-          content={content}
-        />
-      ))}
+      {data ? (
+        data.map(
+          (
+            { id, title, subTitle, createdAt, content, authorPost, published },
+            key
+          ) => (
+            <PostBlog
+              key={key}
+              index={key}
+              id={id}
+              title={title}
+              subTitle={subTitle}
+              owner={authorPost.firstName + " " + authorPost.lastName}
+              date={new Date(createdAt).toDateString()}
+              content={content}
+              published={published}
+            />
+          )
+        )
+      ) : (
+        <div className="mx-auto w-1/2 mt-8">
+          <h4 className="text-lg font-bold mx-auto w-1/2">
+            {"Vous n'avez pas d'abonnement"}
+          </h4>
+        </div>
+      )}
     </div>
   )
 }
@@ -41,14 +56,9 @@ export async function getServerSideProps({ req, res }) {
       .split("=")[1]
     let data = []
     const request = api
-      .post(
-        "/post/feed",
-
-        { authorId: 5 },
-        {
-          headers: { Authorization: jwt },
-        }
-      )
+      .get("/post/feed", {
+        headers: { Authorization: jwt },
+      })
       .then((res) => {
         data = res.data
       })

@@ -3,15 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "env-cmd next dev",
-    "build": "env-cmd next build",
-    "start": "env-cmd next start",
-    "lint": "env-cmd next lint"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@headlessui/react": "^1.5.0",
     "axios": "^0.26.1",
-    "env-cmd": "^10.1.0",
     "formik": "^2.2.9",
     "next": "12.1.0",
     "next-auth": "^4.3.1",

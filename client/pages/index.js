@@ -16,13 +16,14 @@ export default function Home(props) {
       localStorage.removeItem("jwt")
       localStorage.removeItem("userLevel")
       localStorage.removeItem("authId")
+      localStorage.removeItem("profile")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 
   const fetchRemote = () => {
     api
-      .get("/sign-in", {
+      .get("/session", {
         headers: {
           Authorization: document.cookie
             .split("; ")
@@ -31,12 +32,14 @@ export default function Home(props) {
         },
       })
       .then((res) => {
-        router.push("/posts/feeds")
         localStorage.setItem("jwt", res.data.token)
-        localStorage.setItem("userhLevel", res.data.userLevel)
-        localStorage.setItem("authId", res.data.profile.id)
+        localStorage.setItem("userLevel", res.data.userLevel)
+        localStorage.setItem("authId", res.data.authId)
+        localStorage.setItem("profile", res.data.authName)
         handleUserLevel(res.data.userLevel)
-        handleAuthId(res.data.profile.id)
+        handleAuthId(res.data.authId)
+        handleSetUser(res.data.authName)
+        router.push("/posts/feeds")
       })
       .catch(() => {
         router.push("/posts/popular")

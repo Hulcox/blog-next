@@ -12,16 +12,17 @@ export const createComment = async (req, res) => {
     params: { postId },
   } = req;
 
+  await prisma.comment.create({
+    data: {
+      content: content,
+      postId: Number(postId),
+      authorCommentId: Number(authorCommentId),
+    },
+  });
   try {
-    await prisma.comment.create({
-      data: {
-        content: content,
-        postId: Number(postId),
-        authorCommentId: authorCommentId,
-      },
+    const comment = await prisma.comment.findMany({
+      include: { authorComment: true },
     });
-
-    const comment = await prisma.comment.findMany();
 
     res.status(200).send(comment);
   } catch (error) {
@@ -30,8 +31,14 @@ export const createComment = async (req, res) => {
 };
 
 export const readAllComment = async (req, res) => {
+  const {
+    params: { postId },
+  } = req;
   try {
-    const comment = await prisma.comment.findMany();
+    const comment = await prisma.comment.findMany({
+      where: { postId: Number(postId) },
+      include: { authorComment: true },
+    });
 
     res.status(200).send(comment);
   } catch (error) {

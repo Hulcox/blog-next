@@ -7,6 +7,7 @@ const MenuDropDown = ({ children }) => {
   const router = useRouter()
 
   const handleRoute = (href) => {
+    console.log(href)
     router.push("/" + href)
   }
 
@@ -26,31 +27,29 @@ const MenuDropDown = ({ children }) => {
         >
           <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="px-1 py-1 ">
-              <Menu.Item onClick={() => handleRoute("/profile")}>
+              <Menu.Item onClick={() => handleRoute("profile/account")}>
                 {({ active }) => (
-                  <>
-                    <button
-                      className={
-                        "hover:bg-[#1f2937] hover:opacity-75 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-xl"
-                      }
-                    >
-                      <span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-2"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </span>
-                      {"Profile"}
-                    </button>
-                  </>
+                  <button
+                    className={
+                      "hover:bg-[#1f2937] hover:opacity-75 hover:text-white text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-xl"
+                    }
+                  >
+                    <span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 mr-2"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </span>
+                    {"Profile"}
+                  </button>
                 )}
               </Menu.Item>
             </div>

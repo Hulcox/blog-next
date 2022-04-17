@@ -54,17 +54,34 @@ const MyPost = ({ data }) => {
       {writepost ? (
         <WritePost />
       ) : (
-        data.map(({ title, subTitle, createdAt, content, authorPost }, key) => (
-          <PostBlog
-            key={key}
-            id={1}
-            title={title}
-            subTitle={subTitle}
-            owner={authorPost.firstName + " " + authorPost.lastName}
-            date={new Date(createdAt).toDateString()}
-            content={content}
-          />
-        ))
+        data.map(
+          (
+            {
+              id,
+              title,
+              subTitle,
+              createdAt,
+              content,
+              authorPost,
+              authorId,
+              published,
+            },
+            key
+          ) => (
+            <PostBlog
+              key={key}
+              index={key}
+              id={id}
+              title={title}
+              subTitle={subTitle}
+              owner={authorPost.firstName + " " + authorPost.lastName}
+              date={new Date(createdAt).toDateString()}
+              content={content}
+              published={published}
+              authorId={authorId}
+            />
+          )
+        )
       )}
     </div>
   )

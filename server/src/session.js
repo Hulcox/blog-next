@@ -22,7 +22,12 @@ import {
   updatePost,
 } from "./routes/Post.js";
 import { deleteProfile, readProfile, updateProfile } from "./routes/Profile.js";
-import { userSignIn, userSignUp } from "./routes/User.js";
+import {
+  userSession,
+  userSignIn,
+  userSignUp,
+  userUpdate,
+} from "./routes/User.js";
 
 const sessionRoutes = ({ app }) => {
   app.post("/post", auth, async (req, res) => {
@@ -34,7 +39,7 @@ const sessionRoutes = ({ app }) => {
   app.get("/post/popular", async (req, res) => {
     await readAllPopularPost(req, res);
   });
-  app.post("/post/feed", auth, async (req, res) => {
+  app.get("/post/feed", auth, async (req, res) => {
     await readAllFeedPost(req, res);
   });
   app.get("/post/mypost/:authId", async (req, res) => {
@@ -59,7 +64,7 @@ const sessionRoutes = ({ app }) => {
   app.post("/comment/:postId", auth, async (req, res) => {
     await createComment(req, res);
   });
-  app.get("/comment", async (req, res) => {
+  app.get("/comment/:postId", async (req, res) => {
     await readAllComment(req, res);
   });
   app.get("/comment/:commentId", auth, async (req, res) => {
@@ -83,6 +88,12 @@ const sessionRoutes = ({ app }) => {
   });
   app.post("/sign-up", async (req, res) => {
     await userSignUp(req, res);
+  });
+  app.get("/session", async (req, res) => {
+    await userSession(req, res);
+  });
+  app.put("/user", async (req, res) => {
+    await userUpdate(req, res);
   });
 
   app.post("/profile", auth, async (req, res) => {

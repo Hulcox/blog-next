@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Field, Form, Formik } from "formik"
+import { ErrorMessage, Field, Form, Formik } from "formik"
 import { useRouter } from "next/router"
 import { useCallback, useContext } from "react"
 import * as Yup from "yup"
@@ -30,8 +30,8 @@ const LoginPageSignIn = () => {
   }, [])
 
   const fetchRemote = (value) => {
-    axios
-      .post("http://localhost:3030/sign-in", {
+    api
+      .post("/sign-in", {
         email: value.email,
         password: value.password,
       })
@@ -40,9 +40,10 @@ const LoginPageSignIn = () => {
         console.log(data)
         localStorage.setItem("jwt", data.token)
         localStorage.setItem("userLevel", data.userLevel)
-        localStorage.setItem("authId", data.profile.id)
+        localStorage.setItem("authId", data.authId)
+        localStorage.setItem("profile", data.profile)
         document.cookie = "jwt=" + data.token + "; path=/"
-        document.cookie = "authId=" + data.profile.id + "; path=/"
+        document.cookie = "authId=" + data.authId + "; path=/"
         handleUserLevel(data.userLevel)
         handleAuthId(data.profile.id)
         router.push("/posts/feeds")
@@ -65,8 +66,8 @@ const LoginPageSignIn = () => {
           <Formik
             validationSchema={CommentSchema}
             initialValues={{
-              email: null,
-              password: null,
+              email: "",
+              password: "",
             }}
             onSubmit={handleFormSubmit}
           >
@@ -90,6 +91,12 @@ const LoginPageSignIn = () => {
                           as={InputForm}
                           required
                         />
+                        <ErrorMessage
+                          name="email"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
 
                       <div className="col-span-6 sm:col-span-4">
@@ -103,6 +110,12 @@ const LoginPageSignIn = () => {
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           as={InputForm}
                           required
+                        />
+                        <ErrorMessage
+                          name="password"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
                         />
                       </div>
                     </div>

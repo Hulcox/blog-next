@@ -19,8 +19,6 @@ export const userSignIn = async (req, res) => {
       },
     });
 
-    console.log(user);
-
     const [passwordHash, passwordSalt] = hashPassword(
       password,
       user.passwordSalt
@@ -32,7 +30,13 @@ export const userSignIn = async (req, res) => {
     }
 
     const token = jsonwebtoken.sign(
-      { payload: { userId: user.id, userLevel: user.levelAuth } },
+      {
+        payload: {
+          userId: user.id,
+          userLevel: user.levelAuth,
+          authId: user.profile.id,
+        },
+      },
       user.passwordSalt,
       {
         expiresIn: "24 hours",
@@ -42,7 +46,8 @@ export const userSignIn = async (req, res) => {
     res.send({
       token: token,
       userLevel: user.levelAuth,
-      profile: user.profile,
+      authId: user.profile.id,
+      profile: user.profile.firstName + " " + user.profile.lastName,
     });
   } catch (error) {
     res.status(400).send("Problème survenue : " + error);
@@ -91,5 +96,68 @@ export const userSignUp = async (req, res) => {
     res.send(user + profile);
   } catch (error) {
     res.status(400).send("Problème survenue : " + error);
+  }
+};
+
+export const userUpdate = async (req, res) => {
+  const {
+    body: { email, password },
+  } = req;
+
+  try {
+    const [passwordHash, passwordSalt] = hashPassword(password);
+
+    await prisma.user.update({
+      data: {
+        email: email,
+        passwordHash: passwordHash,
+        passwordSalt: passwordSalt,
+      },
+    });
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    const profile = await prisma.profile.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    res.send(user + profile);
+  } catch (error) {
+    res.status(400).send("Problème survenue : " + error);
+  }
+};
+
+export const userSession = async (req, res) => {
+  const {
+    headers: { authorization },
+  } = req;
+  const token = jsonwebtoken.decode(authorization);
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: token.payload.userId },
+      include: {
+        profile: true,
+      },
+    });
+    const authId = token.payload.authId;
+    const userLevel = token.payload.userLevel;
+    jsonwebtoken.verify(authorization, user.passwordSalt);
+    res.status(200).send({
+      token: authorization,
+      userLevel: userLevel,
+      authId: authId,
+      authName: user.profile.firstName + " " + user.profile.lastName,
+      profile: user,
+    });
+  } catch (err) {
+    console.log("token invalid !");
+    res.status(403).send("token invalid !");
   }
 };

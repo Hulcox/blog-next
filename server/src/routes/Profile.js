@@ -20,9 +20,9 @@ export const readProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const {
-    body: { firstName, lastName, address, city, zip_code, profileId },
+    body: { firstName, lastName, address, city, zip_code },
   } = req;
-
+  const profileId = res.authId;
   try {
     const profile = await prisma.profile.update({
       where: { id: Number(profileId) },
@@ -42,9 +42,7 @@ export const updateProfile = async (req, res) => {
 };
 
 export const deleteProfile = async (req, res) => {
-  const {
-    body: { profileId },
-  } = req;
+  const profileId = res.authId;
   try {
     const profile = await prisma.profile.findUnique({
       where: { id: Number(profileId) },

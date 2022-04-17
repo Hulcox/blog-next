@@ -33,7 +33,7 @@ const HeaderNavBar = () => {
   const handleClickFeed = () => {
     router.push("/posts/feeds")
   }
-
+  console.log(userLevel)
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="relative flex items-center justify-between h-16 mx-4">

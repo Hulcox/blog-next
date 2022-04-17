@@ -17,8 +17,10 @@ model Post {
   content             String
   like                Int      @default(0)
   authorPost          Profile  @relation(fields: [authorId], references: [id])
-  authorId            Int      @unique
+  authorId            Int      
   comment             Comment[]
+  liked               Like[]  @relation(name: "liked")
+  published           Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt @default(now())
 }
@@ -30,7 +32,7 @@ model Comment {
   post                Post     @relation(fields: [postId], references: [id])
   postId              Int
   authorComment       Profile  @relation(fields: [authorCommentId], references: [id])
-  authorCommentId     Int      @unique
+  authorCommentId     Int      
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt @default(now())
 }
@@ -41,6 +43,16 @@ model Follow {
   followersId         Int
   followed            Profile  @relation(name: "followed",fields: [followedId], references: [id])
   followedId          Int  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt @default(now())
+}
+
+model Like {
+  id                  Int      @id @default(autoincrement())
+  liker               Profile  @relation(name: "liker",fields: [likerId], references: [id])
+  likerId             Int
+  liked               Post  @relation(name: "liked",fields: [likedId], references: [id])
+  likedId             Int  
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt @default(now())
 }
@@ -56,7 +68,8 @@ model Profile {
   userId              Int       @unique
   posts               Post[]
   comment             Comment[]
-  followers           Follow[]  @relation(name: "followers")
+  postLike            Like[]  @relation(name: "liker")
+  followers           Follow[]  @relation(name: "followers") 
   followed            Follow[]  @relation(name: "followed")
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt @default(now())

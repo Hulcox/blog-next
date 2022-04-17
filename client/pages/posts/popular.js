@@ -11,7 +11,8 @@ const PopularPost = ({ data }) => {
 
   useEffect(() => {
     handleSetPost(data)
-  }, [handleSetPost, data])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
 
   return (
     <div>
@@ -19,17 +20,24 @@ const PopularPost = ({ data }) => {
       <div className="mx-auto w-1/2 mt-8 shadow-gray-100 shadow-md p-4 flex justify-between bg-slate-200 items-center rounded">
         <h1 className="text-xl font-bold">{"Most Popular Posts"}</h1>
       </div>
-      {data.map(({ title, subTitle, createdAt, content, authorPost }, key) => (
-        <PostBlog
-          key={key}
-          id={1}
-          title={title}
-          subTitle={subTitle}
-          owner={authorPost.firstName + " " + authorPost.lastName}
-          date={new Date(createdAt).toDateString()}
-          content={content}
-        />
-      ))}
+      {data.map(
+        (
+          { id, title, subTitle, createdAt, content, authorPost, published },
+          key
+        ) => (
+          <PostBlog
+            key={key}
+            index={key}
+            id={id}
+            title={title}
+            subTitle={subTitle}
+            owner={authorPost.firstName + " " + authorPost.lastName}
+            date={new Date(createdAt).toDateString()}
+            content={content}
+            published={published}
+          />
+        )
+      )}
     </div>
   )
 }

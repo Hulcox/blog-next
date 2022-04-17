@@ -1,13 +1,14 @@
-import { Field, Form, Formik } from "formik"
+import { ErrorMessage, Field, Form, Formik } from "formik"
 import { useRouter } from "next/router"
 import { useCallback, useContext } from "react"
 import * as Yup from "yup"
+import api from "../../src/components/api"
 import AppContext from "../../src/components/appContext"
 import InputForm from "../../src/components/formikComponents/InputFrom"
 import HeaderNavBar from "../../src/components/header/header"
 
 const LoginPageSignUp = () => {
-  const { handleSetComments } = useContext(AppContext)
+  const { handleUserLevel, handleAuthId } = useContext(AppContext)
   const router = useRouter()
 
   const classNames = (...classes) => {
@@ -15,23 +16,69 @@ const LoginPageSignUp = () => {
   }
 
   const CommentSchema = Yup.object().shape({
-    textarea: Yup.string()
-      .max(500, "Comment max size 500!")
+    firstName: Yup.string()
+      .required(" Required")
+      .min(1, "Please enter your First Name"),
+    lastName: Yup.string()
+      .required(" Required")
+      .min(1, "Please enter your Last Name"),
+    email: Yup.string()
+      .email("Incorect Email: example@example.com")
       .required(" Required"),
+    address: Yup.string().required("Required"),
+    city: Yup.string().nullable(),
+    zip_code: Yup.number()
+      .positive("Negative value is not allowed")
+      .integer()
+      .nullable(),
+    password: Yup.string()
+      .required("Please enter your password")
+      .matches(
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/gm,
+        "Password must contain at least 8 characters, one uppercase, one number and one special case character"
+      ),
+    confirm_password: Yup.string()
+      .required("Please confirm your password")
+      .oneOf([Yup.ref("password"), null], "Passwords don't match."),
   })
 
-  const handleFormSubmit = useCallback(
-    (value, { resetForm }) => {
-      console.log(value)
-      handleSetComments({
-        owner: "Romain le boss",
-        date: Date.now(),
-        comment: value.textarea,
+  const handleFormSubmit = useCallback((value, { resetForm }) => {
+    try {
+      fetchRemote(value).then(() => {
+        api
+          .post("/sign-in", {
+            email: value.email,
+            password: value.password,
+          })
+          .then((res) => {
+            const data = res.data
+            console.log(data)
+            localStorage.setItem("jwt", data.token)
+            localStorage.setItem("userLevel", data.userLevel)
+            localStorage.setItem("authId", data.profile.id)
+            document.cookie = "jwt=" + data.token + "; path=/"
+            document.cookie = "authId=" + data.profile.id + "; path=/"
+            handleUserLevel(data.userLevel)
+            handleAuthId(data.profile.id)
+            router.push("/posts/feeds")
+          })
       })
+    } catch (error) {
       resetForm()
-    },
-    [handleSetComments]
-  )
+    }
+  }, [])
+
+  const fetchRemote = async (value) => {
+    api.post("/sign-up", {
+      firstName: value.firstName,
+      lastName: value.lastName,
+      email: value.email,
+      address: value.address,
+      city: value.city,
+      zip_code: value.zip_code,
+      password: value.password,
+    })
+  }
 
   const signIn = () => {
     router.push("/login/sign-in")
@@ -48,10 +95,10 @@ const LoginPageSignUp = () => {
           <Formik
             validationSchema={CommentSchema}
             initialValues={{
-              firstName: null,
-              lastName: null,
-              email: null,
-              address: null,
+              firstName: "",
+              lastName: "",
+              email: "",
+              address: "",
               city: null,
               zip_code: null,
               password: null,
@@ -79,6 +126,12 @@ const LoginPageSignUp = () => {
                           as={InputForm}
                           required
                         />
+                        <ErrorMessage
+                          name="firstName"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
 
                       <div className="col-span-6 sm:col-span-3">
@@ -92,8 +145,13 @@ const LoginPageSignUp = () => {
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           as={InputForm}
                         />
+                        <ErrorMessage
+                          name="lastName"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
-
                       <div className="col-span-6 sm:col-span-4">
                         <label className="block text-sm font-medium text-gray-700">
                           Email address
@@ -105,6 +163,12 @@ const LoginPageSignUp = () => {
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           as={InputForm}
                           required
+                        />
+                        <ErrorMessage
+                          name="email"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
                         />
                       </div>
 
@@ -120,6 +184,12 @@ const LoginPageSignUp = () => {
                           as={InputForm}
                           required
                         />
+                        <ErrorMessage
+                          name="address"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
 
                       <div className="col-span-6 sm:col-span-6 lg:col-span-2">
@@ -132,6 +202,12 @@ const LoginPageSignUp = () => {
                           placeholder="City"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           as={InputForm}
+                        />{" "}
+                        <ErrorMessage
+                          name="city"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
                         />
                       </div>
 
@@ -145,7 +221,12 @@ const LoginPageSignUp = () => {
                           placeholder="Zip Code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                           as={InputForm}
-                          required
+                        />
+                        <ErrorMessage
+                          name="zip_code"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
                         />
                       </div>
                     </div>
@@ -167,6 +248,12 @@ const LoginPageSignUp = () => {
                           as={InputForm}
                           required
                         />
+                        <ErrorMessage
+                          name="password"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
 
                       <div className="col-span-6 sm:col-span-4">
@@ -181,10 +268,16 @@ const LoginPageSignUp = () => {
                           as={InputForm}
                           required
                         />
+                        <ErrorMessage
+                          name="confirm_password"
+                          render={(msg) => (
+                            <div className="text-red-500 text-sm">{msg}</div>
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
-                  <p>
+                  <p className="pl-2">
                     {"Already have an account ? "}
                     <span
                       className="font-bold hover:cursor-pointer"
